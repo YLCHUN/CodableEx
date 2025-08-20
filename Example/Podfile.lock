@@ -1,0 +1,16 @@
+PODS:
+  - CodableEx (0.1.0)
+
+DEPENDENCIES:
+  - CodableEx (from `../`)
+
+EXTERNAL SOURCES:
+  CodableEx:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  CodableEx: bac5893b9607e6a1c8be0c2012154ed38caad5ca
+
+PODFILE CHECKSUM: c02a3e2d8b63b2a890d74630f2254f306e6e6208
+
+COCOAPODS: 1.14.3

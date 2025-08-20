@@ -1,0 +1,13 @@
+use_frameworks!
+
+platform :ios, '10.0'
+
+target 'CodableEx_Example' do
+  pod 'CodableEx', :path => '../'
+
+  target 'CodableEx_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
