@@ -120,45 +120,45 @@ extension SubModel: CodableExFinish {
 ```mermaid
 graph TB
     subgraph "输入层"
-        A[Dictionary<String, Any>]
-        B[Array<[String, Any]>]
-        C[JSON String]
+        A["Dictionary&lt;String, Any&gt;"]
+        B["Array&lt;[String, Any]&gt;"]
+        C["JSON String"]
     end
     
     subgraph "CodableEx 核心引擎"
-        D[CodableEx]
-        E[TypeConverter]
-        F[CodableExBox]
+        D["CodableEx"]
+        E["TypeConverter"]
+        F["CodableExBox"]
     end
     
     subgraph "编解码流程"
-        G[JSONSerialization]
-        H[JSONEncoder/Decoder]
-        I[Foundation Codable]
+        G["JSONSerialization"]
+        H["JSONEncoder/Decoder"]
+        I["Foundation Codable"]
     end
     
     subgraph "输出层"
-        J[Swift Model]
-        K[Array<Model>]
-        L[JSON String]
+        J["Swift Model"]
+        K["Array&lt;Model&gt;"]
+        L["JSON String"]
     end
     
     subgraph "容错机制"
-        M[String ↔ Int ↔ Float ↔ Double ↔ Bool]
-        N[越界保护]
-        O[NaN/Inf 兜底]
+        M["String ↔ Int ↔ Float ↔ Double ↔ Bool"]
+        N["越界保护"]
+        O["NaN/Inf 兜底"]
     end
     
     subgraph "动态 JSON 支持"
-        P[CodableExBox<[String: Any]>]
-        Q[CodableExBox<[Any]>]
-        R[递归编解码]
+        P["CodableExBox&lt;[String: Any]&gt;"]
+        Q["CodableExBox&lt;[Any]&gt;"]
+        R["递归编解码"]
     end
     
     subgraph "完成回调"
-        S[CodableExFinish]
-        T[finishEncode]
-        U[finishDecode]
+        S["CodableExFinish"]
+        T["finishEncode"]
+        U["finishDecode"]
     end
     
     %% 输入到核心引擎
