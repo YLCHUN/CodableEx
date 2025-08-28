@@ -114,12 +114,107 @@ extension SubModel: CodableExFinish {
 ```
 
 ## 原理说明
-- 字典/数组 → 模型：`JSONSerialization.data(withJSONObject:)` → `JSONDecoder().decode(...)`
-- 模型 → 字典/数组：`JSONEncoder().encode(...)` → `JSONSerialization.jsonObject(...)`
-- 解码容错：为 `KeyedDecodingContainer` 提供了多个 `decodeIfPresent(...)` 重载，
+
+### 核心架构图
+
+```mermaid
+graph TB
+    subgraph "输入层"
+        A[Dictionary<String, Any>]
+        B[Array<[String, Any]>]
+        C[JSON String]
+    end
+    
+    subgraph "CodableEx 核心引擎"
+        D[CodableEx]
+        E[TypeConverter]
+        F[CodableExBox]
+    end
+    
+    subgraph "编解码流程"
+        G[JSONSerialization]
+        H[JSONEncoder/Decoder]
+        I[Foundation Codable]
+    end
+    
+    subgraph "输出层"
+        J[Swift Model]
+        K[Array<Model>]
+        L[JSON String]
+    end
+    
+    subgraph "容错机制"
+        M[String ↔ Int ↔ Float ↔ Double ↔ Bool]
+        N[越界保护]
+        O[NaN/Inf 兜底]
+    end
+    
+    subgraph "动态 JSON 支持"
+        P[CodableExBox<[String: Any]>]
+        Q[CodableExBox<[Any]>]
+        R[递归编解码]
+    end
+    
+    subgraph "完成回调"
+        S[CodableExFinish]
+        T[finishEncode]
+        U[finishDecode]
+    end
+    
+    %% 输入到核心引擎
+    A --> D
+    B --> D
+    C --> D
+    
+    %% 核心引擎内部流程
+    D --> G
+    G --> H
+    H --> I
+    
+    %% 类型转换和容错
+    D --> E
+    E --> M
+    M --> N
+    M --> O
+    
+    %% 动态 JSON 处理
+    D --> F
+    F --> P
+    F --> Q
+    F --> R
+    
+    %% 完成回调
+    D --> S
+    S --> T
+    S --> U
+    
+    %% 输出
+    I --> J
+    I --> K
+    I --> L
+    
+    %% 样式
+    classDef inputClass fill:#e1f5fe
+    classDef engineClass fill:#f3e5f5
+    classDef processClass fill:#e8f5e8
+    classDef outputClass fill:#fff3e0
+    classDef featureClass fill:#fce4ec
+    
+    class A,B,C inputClass
+    class D,E,F engineClass
+    class G,H,I processClass
+    class J,K,L outputClass
+    class M,N,O,P,Q,R,S,T,U featureClass
+```
+
+### 工作原理详解
+
+- **字典/数组 → 模型**：`JSONSerialization.data(withJSONObject:)` → `JSONDecoder().decode(...)`
+- **模型 → 字典/数组**：`JSONEncoder().encode(...)` → `JSONSerialization.jsonObject(...)`
+- **解码容错**：为 `KeyedDecodingContainer` 提供了多个 `decodeIfPresent(...)` 重载，
   当目标类型解码失败时，按顺序尝试从备选基础类型（`String`/`Int`/`Float`/`Double` 等）读取并进行安全转换（含越界保护和 NaN/Inf 兜底）。
-- 动态 JSON：`CodableExBox<T>` 通过自定义 `CodingKey` 与容器遍历，递归解/编码基础类型与嵌套结构，实现 `[String: Any]`、`[Any]` 的 Codable 化。
-- 完成回调：当使用容错的 `decodeIfPresent` 或对应的 `encodeIfPresent` 时，会在成功后调用 `finishDecode()`/`finishEncode()`，方便做模型校验、日志或派生计算。
+- **动态 JSON**：`CodableExBox<T>` 通过自定义 `CodingKey` 与容器遍历，递归解/编码基础类型与嵌套结构，实现 `[String: Any]`、`[Any]` 的 Codable 化。
+- **完成回调**：当使用容错的 `decodeIfPresent` 或对应的 `encodeIfPresent` 时，会在成功后调用 `finishDecode()`/`finishEncode()`，方便做模型校验、日志或派生计算。
 
 ## API 速查表
 - 字典/数组与模型：
